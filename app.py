@@ -136,8 +136,15 @@ def index():
                 sheet.cell(row=row_idx, column=col, value=count)
             row_idx += 1
 
+        # Calculate and write the average for domain rating counts
+        sheet.cell(row=row_idx, column=1, value="Average")
+        for col, range_ in enumerate(rating_ranges, start=2):
+            total_count = sum(rating_counts[competitor_name]['domain_rating'][range_] for competitor_name in rating_counts.keys())
+            avg_count = total_count / len(rating_counts)
+            sheet.cell(row=row_idx, column=col, value=avg_count)
+
         # Write the header row for referring domains counts
-        start_row = row_idx + 1
+        start_row = row_idx + 2
         sheet.cell(row=start_row, column=1, value="Competitor")
         for col, range_ in enumerate(rd_ranges, start=2):
             sheet.cell(row=start_row, column=col, value=f"RD {range_[0]}-{range_[1]}")
@@ -150,6 +157,13 @@ def index():
                 count = rating_counts[competitor_name]['referring_domains'][range_]
                 sheet.cell(row=row_idx, column=col, value=count)
             row_idx += 1
+
+        # Calculate and write the average for referring domains counts
+        sheet.cell(row=row_idx, column=1, value="Average")
+        for col, range_ in enumerate(rd_ranges, start=2):
+            total_count = sum(rating_counts[competitor_name]['referring_domains'][range_] for competitor_name in rating_counts.keys())
+            avg_count = total_count / len(rating_counts)
+            sheet.cell(row=row_idx, column=col, value=avg_count)
 
         # Adjust the column width
         for col_num, col_letter in enumerate(get_column_letter(2), start=2):
