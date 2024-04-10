@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domain Sorting Report</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+        .file-upload {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .file-upload label {
+            font-weight: bold;
+            margin-right: 15px;
+            width: 150px;
+            text-align: right;
+        }
+        .file-upload .input-group {
+            flex-grow: 1;
+        }
+        .file-upload input[type="file"] {
+            border: none;
+            background-color: transparent;
+        }
+        .file-upload input[type="file"]::file-selector-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .submit-btn {
+            display: block;
+            width:650px;
+            margin: 0 auto;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        .close {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Domain Sorting Report</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="post" enctype="multipart/form-data">
+            <div class="file-upload">
+                <label for="file1">Competitor 1:</label>
+                <div class="input-group">
+                    <input type="file" name="files[]" id="file1" class="form-control-file">
+                </div>
+            </div>
+            <div class="file-upload">
+                <label for="file2">Competitor 2:</label>
+                <div class="input-group">
+                    <input type="file" name="files[]" id="file2" class="form-control-file">
+                </div>
+            </div>
+            <div class="file-upload">
+                <label for="file3">Competitor 3:</label>
+                <div class="input-group">
+                    <input type="file" name="files[]" id="file3" class="form-control-file">
+                </div>
+            </div>
+            <div class="file-upload">
+                <label for="file4">Competitor 4:</label>
+                <div class="input-group">
+                    <input type="file" name="files[]" id="file4" class="form-control-file">
+                </div>
+            </div>
+            <div class="file-upload">
+                <label for="file5">Competitor 5:</label>
+                <div class="input-group">
+                    <input type="file" name="files[]" id="file5" class="form-control-file">
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn submit-btn">Submit</button>
+            </div>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
