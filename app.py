@@ -9,7 +9,6 @@ import io
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for Flash messages
-
 # Define the rating ranges
 rating_ranges = [
     (0, 10),
@@ -78,31 +77,38 @@ def index():
                     flash(f"Required columns not found in {file.filename}.", 'error')
                     return redirect(url_for('index'))
 
-                # Iterate over each row in the CSV
-                for row_index, row in enumerate(csv_reader):
+                # Read the first data row to get the competitor name
+                try:
+                    first_row = next(csv_reader)
+                    target_url = first_row[target_url_column_index]
+                    competitor_name = urlparse(target_url).netloc
+                except (StopIteration, IndexError):
+                    flash(f"No data found in {file.filename}.", 'error')
+                    return redirect(url_for('index'))
+
+                # Initialize the count for the competitor if it doesn't exist
+                if competitor_name not in rating_counts:
+                    rating_counts[competitor_name] = {
+                        'domain_rating': {range_: 0 for range_ in rating_ranges},
+                        'referring_domains': {range_: 0 for range_ in rd_ranges}
+                    }
+
+                # Iterate over each row in the CSV (including the first row)
+                for row_index, row in enumerate(csv_reader, start=1):
                     try:
                         domain_rating = float(row[domain_rating_column_index])
-                        target_url = row[target_url_column_index]
                         referring_domains = int(row[referring_domains_column_index])
-                        root_domain = urlparse(target_url).netloc
-
-                        # Initialize the count for the root domain if it doesn't exist
-                        if root_domain not in rating_counts:
-                            rating_counts[root_domain] = {
-                                'domain_rating': {range_: 0 for range_ in rating_ranges},
-                                'referring_domains': {range_: 0 for range_ in rd_ranges}
-                            }
 
                         # Increment the count for the corresponding rating range
                         for range_ in rating_ranges:
                             if range_[0] <= domain_rating <= range_[1]:
-                                rating_counts[root_domain]['domain_rating'][range_] += 1
+                                rating_counts[competitor_name]['domain_rating'][range_] += 1
                                 break
 
                         # Increment the count for the corresponding referring domains range
                         for range_ in rd_ranges:
                             if range_[0] <= referring_domains <= range_[1]:
-                                rating_counts[root_domain]['referring_domains'][range_] += 1
+                                rating_counts[competitor_name]['referring_domains'][range_] += 1
                                 break
                     except (IndexError, ValueError) as e:
                         flash(f"Error processing row {row_index + 1} in {file.filename}: {e}", 'error')
@@ -117,31 +123,31 @@ def index():
         sheet = workbook.active
 
         # Write the header row for domain rating counts
-        sheet.cell(row=1, column=1, value="Target Competitor")
+        sheet.cell(row=1, column=1, value="Competitor")
         for col, range_ in enumerate(rating_ranges, start=2):
             sheet.cell(row=1, column=col, value=f"DR {range_[0]}-{range_[1]}")
 
         # Write the data rows for domain rating counts
         row_idx = 2
-        for root_domain in rating_counts.keys():
-            sheet.cell(row=row_idx, column=1, value=root_domain)
+        for competitor_name in rating_counts.keys():
+            sheet.cell(row=row_idx, column=1, value=competitor_name)
             for col, range_ in enumerate(rating_ranges, start=2):
-                count = rating_counts[root_domain]['domain_rating'][range_]
+                count = rating_counts[competitor_name]['domain_rating'][range_]
                 sheet.cell(row=row_idx, column=col, value=count)
             row_idx += 1
 
         # Write the header row for referring domains counts
         start_row = row_idx + 1
-        sheet.cell(row=start_row, column=1, value="Target Competitor")
+        sheet.cell(row=start_row, column=1, value="Competitor")
         for col, range_ in enumerate(rd_ranges, start=2):
             sheet.cell(row=start_row, column=col, value=f"RD {range_[0]}-{range_[1]}")
 
         # Write the data rows for referring domains counts
         row_idx = start_row + 1
-        for root_domain in rating_counts.keys():
-            sheet.cell(row=row_idx, column=1, value=root_domain)
+        for competitor_name in rating_counts.keys():
+            sheet.cell(row=row_idx, column=1, value=competitor_name)
             for col, range_ in enumerate(rd_ranges, start=2):
-                count = rating_counts[root_domain]['referring_domains'][range_]
+                count = rating_counts[competitor_name]['referring_domains'][range_]
                 sheet.cell(row=row_idx, column=col, value=count)
             row_idx += 1
 
