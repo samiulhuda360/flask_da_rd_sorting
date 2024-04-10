@@ -39,7 +39,7 @@ rd_ranges = [
     (1001, float('inf'))  # 1000+
 ]
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/domain-sorting', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         uploaded_files = request.files.getlist('files[]')
